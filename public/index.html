@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard App</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="/styles.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="side-menu fixed top-0 left-0 h-screen w-64 bg-lemon-500 text-white shadow-md">
+        <h2 class="p-4 font-semibold text-xl">Dashboard</h2>
+        <button id="userDataBtn" class="block py-2 px-4 w-full text-left hover:bg-lemon-700">User Data</button>
+        <div class="relative">
+            <button id="metricsBtn" class="block py-2 px-4 w-full text-left hover:bg-lemon-700">Metrics</button>
+            <div id="metricsDropdown" class="hidden absolute left-0 mt-2 w-48 bg-lemon-700 rounded-md shadow-xl z-10">
+                <button id="spinMetricsBtn" class="block py-2 px-4 w-full text-left hover:bg-lemon-900">Spin Metrics</button>
+                <button id="pageVisitsBtn" class="block py-2 px-4 w-full text-left hover:bg-lemon-900">Page Visits</button>
+            </div>
+        </div>
+    </div>
+    <div class="content ml-64 p-8">
+        <div id="view">
+            <p>Welcome to the dashboard!</p>
+        </div>
+    </div>
+    <script>
+        const userDataBtn = document.getElementById('userDataBtn');
+        const metricsBtn = document.getElementById('metricsBtn');
+        const metricsDropdown = document.getElementById('metricsDropdown');
+        const spinMetricsBtn = document.getElementById('spinMetricsBtn');
+        const pageVisitsBtn = document.getElementById('pageVisitsBtn');
+        const view = document.getElementById('view');
+
+        userDataBtn.addEventListener('click', async () => {
+            const response = await fetch('/api/users');
+            const users = await response.json();
+            let table = '<div class="table-container"><table class="table-auto w-full">';
+            table += '<thead><tr><th>Verified</th><th>Spin Count</th><th>Page Visit Count</th><th>Spin Click Count</th></tr></thead><tbody>';
+            users.forEach(user => {
+                table += `<tr><td>${user.verified ? 'Yes' : 'No'}</td><td>${user.spin_count}</td><td>${user.page_visit_count}</td><td>${user.spin_click_count}</td></tr>`;
+            });
+            table += '</tbody></table></div>';
+            view.innerHTML = table;
+        });
+
+        metricsBtn.addEventListener('click', () => {
+            metricsDropdown.classList.toggle('hidden');
+        });
+
+        spinMetricsBtn.addEventListener('click', async () => {
+            const response = await fetch('/api/metrics/spins');
+            const metrics = await response.json();
+            let table = '<div class="table-container"><table class="table-auto w-full">';
+            table += '<thead><tr><th>Date</th><th>Spin Count</th></tr></thead><tbody>';
+            metrics.forEach(metric => {
+                table += `<tr><td>${metric.date}</td><td>${metric.spins}</td></tr>`;
+            });
+            table += '</tbody></table></div>';
+            view.innerHTML = table;
+        });
+
+        pageVisitsBtn.addEventListener('click', async () => {
+            const response = await fetch('/api/metrics/page-visits');
+            const visits = await response.json();
+            let table = '<div class="table-container"><table class="table-auto w-full">';
+            table += '<thead><tr><th>Date</th><th>Visit Count</th></tr></thead><tbody>';
+            visits.forEach(visit => {
+                table += `<tr><td>${visit.date}</td><td>${visit.visits}</td></tr>`;
+            });
+            view.innerHTML = table;
+        });
+    </script>
+</body>
+</html>

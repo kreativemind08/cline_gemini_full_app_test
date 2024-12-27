@@ -1,0 +1,86 @@
+body {
+    font-family: sans-serif;
+    background-color: #f0f0f0;
+    color: #333;
+    margin: 0;
+}
+.side-menu {
+    background-color: lemon;
+    color: #333;
+    width: 250px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding-top: 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+.side-menu h2 {
+    padding: 10px 20px;
+    font-size: 1.5em;
+}
+.side-menu button {
+    display: block;
+    padding: 10px 20px;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.side-menu button:hover {
+    background-color: lightlemon;
+}
+.content {
+    margin-left: 250px;
+    padding: 20px;
+    transition: margin-left 0.3s;
+}
+.dropdown-content {
+    display: none;
+    background-color: lightlemon;
+    padding-left: 20px;
+}
+.dropdown-content button {
+    padding: 10px 20px;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.dropdown-content button:hover {
+    background-color: #e0e0e0;
+}
+.table-container {
+    overflow-x: auto;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+th {
+    background-color: #f2f2f2;
+}
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .side-menu {
+        width: 100%;
+        height: auto;
+        position: static;
+        padding: 10px;
+        text-align: center;
+    }
+    .content {
+        margin-left: 0;
+        padding: 10px;
+    }
+}

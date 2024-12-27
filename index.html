@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard App</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            margin: 0;
+            display: flex;
+        }
+        .sidemenu {
+            width: 250px;
+            background-color: #f0f0f0; /* Light background */
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            border-right: 1px solid #ddd;
+            background-color: #fafaeb; /* Lemon green background */
+        }
+        .sidemenu button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            text-align: left;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            color: #333;
+        }
+        .sidemenu button:hover {
+            background-color: #e0e2db; /* Light lemon green hover */
+        }
+        .sidemenu #metricsBtn {
+            background-color: #f9a825; /* Orange color for metrics button */
+            color: white;
+        }
+        .sidemenu #metricsBtn:hover {
+            background-color: #fbbf24; /* Darker orange on hover */
+        }
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            margin-left: 250px; /* Same as sidemenu width */
+        }
+        .dropdown-content {
+            display: none;
+            padding-left: 10px;
+            margin-top: 5px;
+        }
+        .dropdown-content button {
+            width: 100%;
+            padding: 8px;
+            text-align: left;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-radius: 5px;
+        }
+        .dropdown-content button:hover {
+            background-color: #e0e2db; /* Light lemon green hover */
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f9a825; /* Orange for table headers */
+            color: white;
+        }
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            .sidemenu {
+                position: static;
+                width: 100%;
+                height: auto;
+                border-bottom: 1px solid #ddd;
+                padding: 10px;
+                flex-direction: row;
+                align-items: center;
+                overflow-x: auto;
+            }
+            .sidemenu button {
+                width: auto;
+                margin-right: 10px;
+                margin-bottom: 0;
+            }
+            .content {
+                margin-left: 0;
+            }
+            .dropdown-content {
+                padding-left: 0;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="sidemenu">
+        <button id="userDataBtn">User Data</button>
+        <button id="metricsBtn">Metrics</button>
+        <div id="metricsDropdown" class="dropdown-content">
+            <button id="spinMetricsBtn">Spin Metrics</button>
+            <button id="pageVisitsBtn">Number of Page Visits</button>
+        </div>
+    </div>
+    <div class="content">
+        <div id="userData" class="">
+            <h2>User Data</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Verified</th>
+                            <th>Spin Count</th>
+                            <th>Page Visit Count</th>
+                            <th>Spin Click Count</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userDataBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+        <div id="spinMetrics" class="hidden">
+            <h2>Spin Metrics (Last 7 Days)</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Spins</th>
+                        </tr>
+                    </thead>
+                    <tbody id="spinMetricsBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div id="pageVisits" class="hidden">
+            <h2>Number of Page Visits (Last 7 Days)</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Visits</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pageVisitsBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        const userDataBtn = document.getElementById('userDataBtn');
+        const metricsBtn = document.getElementById('metricsBtn');
+        const metricsDropdown = document.getElementById('metricsDropdown');
+        const spinMetricsBtn = document.getElementById('spinMetricsBtn');
+        const pageVisitsBtn = document.getElementById('pageVisitsBtn');
+        const userDataDiv = document.getElementById('userData');
+        const spinMetricsDiv = document.getElementById('spinMetrics');
+        const pageVisitsDiv = document.getElementById('pageVisits');
+        const userDataBody = document.getElementById('userDataBody');
+        const spinMetricsBody = document.getElementById('spinMetricsBody');
+        const pageVisitsBody = document.getElementById('pageVisitsBody');
+
+        userDataBtn.addEventListener('click', () => {
+            userDataDiv.classList.remove('hidden');
+            spinMetricsDiv.classList.add('hidden');
+            pageVisitsDiv.classList.add('hidden');
+            fetchUserData();
+        });
+
+        metricsBtn.addEventListener('click', () => {
+            metricsDropdown.style.display = metricsDropdown.style.display === 'flex' ? 'none' : 'flex';
+            metricsDropdown.style.flexDirection = 'column';
+            metricsDropdown.style.position = 'absolute';
+            metricsDropdown.style.backgroundColor = '#fafaeb';
+            metricsDropdown.style.padding = '10px';
+            metricsDropdown.style.borderRadius = '5px';
+            metricsDropdown.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+        });
+
+        spinMetricsBtn.addEventListener('click', () => {
+            spinMetricsDiv.classList.remove('hidden');
+            userDataDiv.classList.add('hidden');
+            pageVisitsDiv.classList.add('hidden');
+            fetchSpinMetrics();
+        });
+
+        pageVisitsBtn.addEventListener('click', () => {
+            pageVisitsDiv.classList.remove('hidden');
+            userDataDiv.classList.add('hidden');
+            spinMetricsDiv.classList.add('hidden');
+            fetchPageVisits();
+        });
+
+        // Fetch user data
+        const fetchUserData = async () => {
+            const response = await fetch('/api/users');
+            const users = await response.json();
+            userDataBody.innerHTML = '';
+            users.forEach(user => {
+                const row = userDataBody.insertRow();
+                row.insertCell().textContent = user.verified ? 'Yes' : 'No';
+                row.insertCell().textContent = user.spin_count;
+                row.insertCell().textContent = user.page_visit_count;
+                row.insertCell().textContent = user.spin_click_count;
+            });
+        };
+
+        // Fetch spin metrics
+        const fetchSpinMetrics = async () => {
+            const response = await fetch('/api/metrics/spins');
+            const metrics = await response.json();
+            spinMetricsBody.innerHTML = '';
+            metrics.forEach(metric => {
+                const row = spinMetricsBody.insertRow();
+                row.insertCell().textContent = metric.date;
+                row.insertCell().textContent = metric.spins;
+            });
+        };
+
+        // Fetch page visits
+        const fetchPageVisits = async () => {
+            const response = await fetch('/api/metrics/page-visits');
+            const visits = await response.json();
+            pageVisitsBody.innerHTML = '';
+            visits.forEach(visit => {
+                const row = pageVisitsBody.insertRow();
+                row.insertCell().textContent = visit.date;
+                row.insertCell().textContent = visit.visits;
+            });
+        };
+
+        // Load user data on page load
+        fetchUserData();
+    </script>
+</body>
+</html>
